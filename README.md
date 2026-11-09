@@ -1,2 +1,41 @@
-# mandala-breath
-Дыхание мандалы — плавная дыхательная практика с визуализацией. Mandala Breath — smooth equal-phase breathing exercise with neon mandala.
+# 🌬️ Дыхание мандалы / Mandala Breath
+
+Плавная дыхательная практика с неоновой мандалой: равные фазы вдоха и выдоха, режимы «успокоение» (13→1) и «восходящий» (1→13), 8 языков, звук и вибрация.
+
+Smooth equal-phase breathing exercise with a glowing neon mandala visualization.
+
+## Быстрый старт
+
+1. Открой **[GitHub Pages](https://sushisellvluki-tech.github.io/mandala-breath/)** (после включения Pages — см. ниже).
+2. Или скачай `index.html` и открой локально в браузере.
+
+## Как включить публичную ссылку (GitHub Pages)
+
+1. Зайди в репозиторий: https://github.com/sushisellvluki-tech/mandala-breath
+2. **Settings** → **Pages** (слева)
+3. Source: **Deploy from a branch**
+4. Branch: `main` / folder: `/ (root)`
+5. Save
+
+Через 1–2 минуты появится ссылка вида:
+**https://sushisellvluki-tech.github.io/mandala-breath/**
+
+Эту ссылку можно кидать кому угодно.
+
+## Возможности
+
+- Два направления: 13→1 (успокоение) и 1→13 (восходящий)
+- Плавное синусоидальное дыхание + вращающаяся мандала
+- Звуковые сигналы + haptic-вибрация на мобильных
+- Языки: Русский, English, Українська, Беларуская, Қазақша, Тыва дыл, 中文, Polski
+- Пауза / продолжение, сброс, клавиши Space / R
+- Экран не гаснет во время сессии (Wake Lock)
+
+## Локальный файл
+
+Полная актуальная версия лежит в артефактах чата: `Keepcalm_v3.html`.
+Просто переименуй в `index.html` и замени файл в репозитории (или загрузи через веб-интерфейс GitHub).
+
+---
+
+Сделано с 💜 для спокойного дыхания.
