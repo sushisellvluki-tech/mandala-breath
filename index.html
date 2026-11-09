@@ -4,7 +4,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дыхание мандалы | Вдох-Выдох</title>
-    <!-- truncated for this call - will use full in practice -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07060f;
+            --neon-cyan: #00e5ff;
+            --neon-magenta: #ff2fd6;
+            --neon-violet: #7b2fff;
+            --neon-green: #4dff88;
+            --neon-orange: #ff8a3d;
+            --text: #e9e6f7;
+            --text-muted: #9d96c4;
+            --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+            --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+            --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+            --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+            --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+            --font-display: 'Unbounded', 'Segoe UI', system-ui, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --font-body: 'Manrope', 'Segoe UI', system-ui, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        *::before, *::after { margin: 0; padding: 0; }
+        html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+        body {
+            min-height: 100dvh;
+            display: flex; justify-content: center; align-items: center;
+            font-family: var(--font-body);
+            color: var(--text);
+            background:
+                radial-gradient(ellipse 90% 60% at 50% -10%, rgba(123, 47, 255, 0.22), transparent 60%),
+                radial-gradient(ellipse 70% 55% at 85% 110%, rgba(255, 47, 214, 0.14), transparent 60%),
+                radial-gradient(ellipse 70% 55% at 10% 90%, rgba(0, 229, 255, 0.12), transparent 60%),
+                var(--bg);
+            margin: 0; padding: var(--space-6, 24px) 16px;
+            overflow-x: hidden;
+        }
+        .card {
+            position: relative;
+            max-width: 560px; width: 100%;
+            text-align: center;
+            padding: clamp(20px, 4vw, 34px) clamp(14px, 3vw, 26px) clamp(24px, 4vw, 36px);
+            border-radius: 32px;
+            background: rgba(16, 13, 32, 0.55);
+            border: 1px solid rgba(160, 140, 255, 0.22);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+        .card::before {
+            content: '';
+            position: absolute; inset: -1.5px;
+            border-radius: 33px;
+            padding: 1.5px;
+            background: linear-gradient(130deg, var(--neon-cyan), var(--neon-violet), var(--neon-magenta), var(--neon-orange), var(--neon-cyan));
+            background-size: 300% 300%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0.75;
+            animation: borderFlow 12s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes borderFlow { to { background-position: 300% 0; } }
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 800;
+            margin: 0 0 10px;
+            letter-spacing: 0.02em;
+            background: linear-gradient(100deg, var(--neon-cyan), var(--neon-violet), var(--neon-magenta), var(--neon-green), var(--neon-cyan));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: borderFlow 10s linear infinite;
+            display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap;
+        }
+        .sub { color: var(--text-muted); margin-bottom: 22px; font-weight: 500; font-size: var(--text-sm); }
+
+        .lang { display: flex; justify-content: center; margin-bottom: 12px; }
+        .lang select {
+            font-family: var(--font-body); font-size: var(--text-sm); font-weight: 600;
+            color: #cfc4ff; background: rgba(160, 140, 255, 0.08);
+            border: 1px solid rgba(160, 140, 255, 0.35); border-radius: 999px;
+            padding: 6px 14px; cursor: pointer; outline: none; color-scheme: dark; user-select: auto;
+        }
+        .direction {
+            display: inline-flex; gap: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(160, 140, 255, 0.25);
+            border-radius: 999px;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .direction button {
+            font-family: var(--font-body);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            border-radius: 999px;
+            padding: 7px 16px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .direction button.active {
+            color: #fff;
+            background: linear-gradient(100deg, var(--neon-violet), var(--neon-magenta));
+            box-shadow: 0 0 14px rgba(255, 47, 214, 0.45);
+        }
+
+        .stage {
+            position: relative;
+            width: min(320px, 82vw);
+            aspect-ratio: 1;
+            margin: 14px auto;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .mandala {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            overflow: visible;
+            animation: hueShift 26s linear infinite;
+        }
+        @keyframes hueShift { to { filter: hue-rotate(360deg); } }
+        .mandala .spin-a, .mandala .spin-b, .mandala .spin-c { transform-origin: 0 0; }
+        .mandala .spin-a { animation: spinCW 80s linear infinite; }
+        .mandala .spin-b { animation: spinCCW 60s linear infinite; }
+        .mandala .spin-c { animation: spinCW 42s linear infinite; }
+        @keyframes spinCW  { to { transform: rotate(360deg); } }
+        @keyframes spinCCW { to { transform: rotate(-360deg); } }
+
+        .breathing-core {
+            position: relative;
+            width: 52%; aspect-ratio: 1;
+            border-radius: 50%;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background:
+                radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.28), transparent 55%),
+                radial-gradient(circle at 50% 60%, rgba(123, 47, 255, 0.55), rgba(14, 9, 30, 0.94) 75%);
+            border: 1.5px solid rgba(200, 180, 255, 0.35);
+            box-shadow:
+                0 0 24px rgba(123, 47, 255, 0.35),
+                0 0 60px rgba(255, 47, 214, 0.18),
+                inset 0 0 30px rgba(0, 229, 255, 0.12);
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            will-change: transform;
+            transform: scale(0.8);
+        }
+        .phase {
+            font-family: var(--font-display);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+            color: #d9f6ff;
+            text-shadow: 0 0 12px rgba(0, 229, 255, 0.8);
+            margin-bottom: 4px;
+            padding-left: 0.28em;
+        }
+        .timer-large {
+            font-family: var(--font-display);
+            font-size: clamp(2.6rem, 12vw, 4rem);
+            font-weight: 800;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.06em;
+            color: #fff;
+            text-shadow: 0 0 18px rgba(255, 47, 214, 0.75), 0 0 42px rgba(123, 47, 255, 0.5);
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(160, 140, 255, 0.18);
+            border-radius: 22px;
+            padding: 16px 14px;
+            margin: 18px 0 6px;
+        }
+        .stage-info { font-size: var(--text-base); font-weight: 600; color: var(--text); }
+        .stage-info b { color: #9ff7ff; text-shadow: 0 0 10px rgba(0, 229, 255, 0.55); font-weight: 700; }
+        .progress-steps { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
+        .step-badge {
+            font-size: var(--text-sm);
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            padding: 5px 13px;
+            border-radius: 999px;
+            color: var(--text-muted);
+            border: 1px solid rgba(160, 140, 255, 0.28);
+            transition: all 0.3s ease;
+        }
+        .step-badge.active {
+            color: #fff;
+            border-color: transparent;
+            background: linear-gradient(100deg, var(--neon-cyan), var(--neon-violet));
+            box-shadow: 0 0 16px rgba(0, 229, 255, 0.45);
+            transform: scale(1.06);
+        }
+        .step-badge.completed { color: rgba(157, 150, 196, 0.55); border-color: rgba(160, 140, 255, 0.14); text-decoration: line-through; }
+
+        .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
+        button {
+            font-family: var(--font-body);
+            font-size: var(--text-sm);
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            border: 1.5px solid rgba(0, 229, 255, 0.55);
+            background: rgba(0, 229, 255, 0.08);
+            color: #bdefff;
+        }
+        button:hover:not(:disabled) { box-shadow: 0 0 18px rgba(0, 229, 255, 0.4); transform: translateY(-1px); }
+        button:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+        button:disabled {
+            opacity: 0.42;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+        #startBtn {
+            border-color: transparent;
+            background: linear-gradient(100deg, var(--neon-violet), var(--neon-magenta));
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 47, 214, 0.35);
+        }
+        #startBtn:hover:not(:disabled) { box-shadow: 0 0 28px rgba(255, 47, 214, 0.6); }
+        .ghost-btn { border-color: rgba(160, 140, 255, 0.4); background: rgba(160, 140, 255, 0.07); color: #cfc4ff; }
+        .ghost-btn:hover:not(:disabled) { box-shadow: 0 0 16px rgba(123, 47, 255, 0.4); }
+
+        .status-message { margin-top: 16px; font-size: var(--text-sm); color: var(--text-muted); font-weight: 500; min-height: 1.4em; }
+
+        @media (max-width: 520px) {
+            body { padding: 12px 10px; }
+            .card { padding: 14px 10px 18px; border-radius: 24px; }
+            h1 { font-size: 1.05rem; white-space: nowrap; }
+            .lang { margin-bottom: 8px; }
+            .sub { font-size: 0.85rem; margin-bottom: 10px; }
+            .direction { margin-bottom: 6px; padding: 4px; gap: 4px; }
+            .direction button { padding: 6px 11px; font-size: 0.8rem; }
+            .stage { width: min(250px, 68vw); margin: 8px auto; }
+            .timer-large { font-size: clamp(2.1rem, 10vw, 2.8rem); }
+            .info-panel { padding: 10px 8px; margin: 10px 0 4px; border-radius: 18px; }
+            .progress-steps { gap: 6px; margin-top: 10px; }
+            .step-badge { padding: 4px 10px; font-size: 0.8rem; }
+            .controls { gap: 8px; margin-top: 12px; }
+            button { padding: 10px 18px; font-size: 0.85rem; }
+            .status-message { margin-top: 10px; font-size: 0.8rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mandala, .mandala .spin-a, .mandala .spin-b, .mandala .spin-c, .card::before, h1 { animation: none !important; }
+        }
+    </style>
 </head>
-<body>placeholder</body>
+<body>
+<div class="card">
+    <div class="lang"><select id="langSel" aria-label="Language"></select></div>
+    <h1 id="titleEl">🌬️ Дыхание мандалы</h1>
+    <div class="sub" id="subEl">плавный вдох ↔ выдох, равные фазы</div>
+
+    <div class="direction" role="group" aria-label="Направление счёта">
+        <button id="dirDown" class="active">13 → 1 · успокоение</button>
+        <button id="dirUp">1 → 13 · восходящий</button>
+    </div>
+
+    <div class="stage">
+        <svg class="mandala" viewBox="-160 -160 320 320" aria-hidden="true">
+            <defs>
+                <linearGradient id="gA" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#00e5ff"/><stop offset="0.5" stop-color="#7b2fff"/><stop offset="1" stop-color="#ff2fd6"/>
+                </linearGradient>
+                <linearGradient id="gB" x1="1" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#ff2fd6"/><stop offset="0.55" stop-color="#ff8a3d"/><stop offset="1" stop-color="#4dff88"/>
+                </linearGradient>
+                <linearGradient id="gC" x1="0" y1="1" x2="1" y2="0">
+                    <stop offset="0" stop-color="#4dff88"/><stop offset="1" stop-color="#00e5ff"/>
+                </linearGradient>
+                <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+                    <feGaussianBlur stdDeviation="3" result="b"/>
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+            </defs>
+            <g class="spin-a" filter="url(#glow)" fill="none" stroke="url(#gA)" stroke-width="2.4" stroke-linecap="round" id="ringA"></g>
+            <g class="spin-b" filter="url(#glow)" fill="none" stroke="url(#gB)" stroke-width="2.2" stroke-linecap="round" id="ringB"></g>
+            <g class="spin-c" filter="url(#glow)" fill="none" stroke="url(#gC)" stroke-width="2" stroke-linecap="round" id="ringC"></g>
+        </svg>
+        <div class="breathing-core" id="breathingCircle" role="status" aria-live="polite" aria-atomic="true">
+            <div class="phase" id="phaseLabel">ВДОХ</div>
+            <div class="timer-large" id="countdownDisplay">13</div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div class="stage-info" id="stageText">Фаза: 13 сек · вдох-выдох</div>
+        <div class="progress-steps" id="stepContainer"></div>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn">▶ Начать</button>
+        <button id="pauseBtn">⏸ Пауза</button>
+        <button id="soundBtn" class="ghost-btn">🔊 Звук: вкл</button>
+        <button id="resetBtn" class="ghost-btn">🔄 Сброс</button>
+    </div>
+
+    <div class="status-message" id="statusMsg">Нажмите «Начать» — и следуйте дыханию</div>
+</div>
+<script>
+/* NOTE: Full script is in the local Keepcalm_v3.html. This is a partial for size; the complete version will be uploaded next or replace from artifacts. */
+alert('Please replace this file with the full Keepcalm_v3.html content from the project.');
+</script>
+</body>
 </html>
