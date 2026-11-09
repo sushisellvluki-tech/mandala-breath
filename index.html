@@ -92,6 +92,7 @@
             border: 1px solid rgba(160, 140, 255, 0.35); border-radius: 999px;
             padding: 6px 14px; cursor: pointer; outline: none; color-scheme: dark; user-select: auto;
         }
+        /* ===== Направление ===== */
         .direction {
             display: inline-flex; gap: 6px;
             background: rgba(255, 255, 255, 0.05);
@@ -118,6 +119,7 @@
             box-shadow: 0 0 14px rgba(255, 47, 214, 0.45);
         }
 
+        /* ===== Мандала ===== */
         .stage {
             position: relative;
             width: min(320px, 82vw);
@@ -179,6 +181,7 @@
             text-shadow: 0 0 18px rgba(255, 47, 214, 0.75), 0 0 42px rgba(123, 47, 255, 0.5);
         }
 
+        /* ===== Панель этапа ===== */
         .info-panel {
             background: rgba(255, 255, 255, 0.045);
             border: 1px solid rgba(160, 140, 255, 0.18);
@@ -208,6 +211,7 @@
         }
         .step-badge.completed { color: rgba(157, 150, 196, 0.55); border-color: rgba(160, 140, 255, 0.14); text-decoration: line-through; }
 
+        /* ===== Кнопки ===== */
         .controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
         button {
             font-family: var(--font-body);
@@ -241,6 +245,7 @@
 
         .status-message { margin-top: 16px; font-size: var(--text-sm); color: var(--text-muted); font-weight: 500; min-height: 1.4em; }
 
+        /* ===== Компактный мобильный вид ===== */
         @media (max-width: 520px) {
             body { padding: 12px 10px; }
             .card { padding: 14px 10px 18px; border-radius: 24px; }
@@ -317,8 +322,420 @@
     <div class="status-message" id="statusMsg">Нажмите «Начать» — и следуйте дыханию</div>
 </div>
 <script>
-/* NOTE: Full script is in the local Keepcalm_v3.html. This is a partial for size; the complete version will be uploaded next or replace from artifacts. */
-alert('Please replace this file with the full Keepcalm_v3.html content from the project.');
+    /* ===== Лепестки мандалы ===== */
+    function petalPath(inner, outer, width) {
+        const h = outer - inner;
+        return `M 0 ${-inner} C ${width} ${-(inner + h * 0.3)}, ${width} ${-(inner + h * 0.78)}, 0 ${-outer} C ${-width} ${-(inner + h * 0.78)}, ${-width} ${-(inner + h * 0.3)}, 0 ${-inner} Z`;
+    }
+    function buildRing(groupId, count, inner, outer, width) {
+        const g = document.getElementById(groupId);
+        const d = petalPath(inner, outer, width);
+        for (let i = 0; i < count; i++) {
+            const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            p.setAttribute('d', d);
+            p.setAttribute('transform', `rotate(${(360 / count) * i})`);
+            g.appendChild(p);
+        }
+    }
+    buildRing('ringA', 16, 96, 152, 15);
+    buildRing('ringB', 12, 60, 106, 13);
+    buildRing('ringC', 8, 22, 62, 11);
+
+    /* ===== Языки ===== */
+    const KEYS = ["title", "sub", "down", "up", "in", "out", "start", "pause", "snd1", "snd0", "reset", "idle", "run", "paused", "done", "doneTxt", "doneSt", "stage", "sec", "resume"];
+    const I18N = {
+        ru: ["Дыхание мандалы", "плавный вдох ↔ выдох, равные фазы", "13 → 1 · успокоение", "1 → 13 · восходящий", "Вдох", "Выдох", "▶ Начать", "⏸ Пауза", "🔊 Звук: вкл", "🔇 Звук: выкл", "🔄 Сброс", "Нажмите «Начать» — и следуйте дыханию", "Дышите плавно… следуйте мандале.", "Пауза. Нажмите «Продолжить».", "Готово!", "✨ Отлично! Дыхание завершено. ✨", "Молодец! Нажмите «Сброс», чтобы повторить.", "Этап", "сек", "▶ Продолжить"],
+        en: ["Mandala Breath", "smooth inhale ↔ exhale, equal phases", "13 → 1 · calming", "1 → 13 · rising", "Inhale", "Exhale", "▶ Start", "⏸ Pause", "🔊 Sound: on", "🔇 Sound: off", "🔄 Reset", "Press “Start” and follow your breath", "Breathe smoothly… follow the mandala.", "Paused. Press “Resume” to continue.", "Done!", "✨ Well done! Breathing complete. ✨", "Great job! Press “Reset” to repeat.", "Stage", "sec", "▶ Resume"],
+        uk: ["Дихання мандали", "плавний вдих ↔ видих, рівні фази", "13 → 1 · заспокоєння", "1 → 13 · висхідний", "Вдих", "Видих", "▶ Почати", "⏸ Пауза", "🔊 Звук: увімк.", "🔇 Звук: вимк.", "🔄 Скинути", "Натисніть «Почати» і слідуйте за диханням", "Дихайте плавно… слідкуйте за мандалою.", "Пауза. Натисніть «Продовжити».", "Готово!", "✨ Чудово! Дихання завершено. ✨", "Молодець! Натисніть «Скинути», щоб повторити.", "Етап", "с", "▶ Продовжити"],
+        be: ["Дыханне мандалы", "плыўны ўдых ↔ выдых, роўныя фазы", "13 → 1 · супакаенне", "1 → 13 · узыходны", "Удых", "Выдых", "▶ Пачаць", "⏸ Паўза", "🔊 Гук: укл.", "🔇 Гук: выкл.", "🔄 Скід", "Націсніце «Пачаць» і сачыце за дыханнем", "Дыхайце плаўна… сачыце за мандалай.", "Паўза. Націсніце «Працягнуць».", "Гатова!", "✨ Выдатна! Дыханне завершана. ✨", "Малайчына! Націсніце «Скід», каб паўтарыць.", "Этап", "с", "▶ Працягнуць"],
+        kk: ["Мандала тынысы", "баяу дем алу ↔ дем шығару, тең фазалар", "13 → 1 · тыныштандыру", "1 → 13 · өрлеу", "Дем алу", "Дем шығару", "▶ Бастау", "⏸ Кідіріс", "🔊 Дыбыс: қосулы", "🔇 Дыбыс: өшірулі", "🔄 Қайта бастау", "«Бастау» батырмасын басып, тынысыңызды бақылаңыз", "Баяу тыныс алыңыз… мандаланы бақылаңыз.", "Кідіріс. «Жалғастыру» басыңыз.", "Дайын!", "✨ Керемет! Тыныс жаттығуы аяқталды. ✨", "Жарайсыз! Қайталау үшін «Қайта бастау» басыңыз.", "Кезең", "сек", "▶ Жалғастыру"],
+        tyv: ["Мандала тынышы", "дең үелер: тыныш алыр ↔ тыныш үндүрер", "13 → 1 · дыштаныр", "1 → 13 · өзүлде", "Тыныш алыр", "Тыныш үндүрер", "▶ Эгелээр", "⏸ Соксаал", "🔊 Үн: ажык", "🔇 Үн: хаалган", "🔄 Катап эгелээр", "Тынышты сагып, «Эгелээр» дээш базыңар", "Чымчак тынып көрүңер… мандаланы сагыңар.", "Соксаан. «Уламчылаар» дээш базыңар.", "Белен!", "✨ Эки! Тыныш чаңчыл дооскан. ✨", "Рахмат! Катап кылыры-биле «Катап эгелээр» дээш базыңар.", "Үе", "сек", "▶ Уламчылаар"],
+        zh: ["曼陀罗呼吸", "平稳吸气 ↔ 呼气，两相等长", "13 → 1 · 舒缓", "1 → 13 · 渐进", "吸气", "呼气", "▶ 开始", "⏸ 暂停", "🔊 声音：开", "🔇 声音：关", "🔄 重置", "点击“开始”，跟随呼吸", "平稳呼吸……跟随曼陀罗。", "已暂停。点击“继续”。", "完成！", "✨ 很好！呼吸练习完成。✨", "做得好！点击“重置”可重新开始。", "阶段", "秒", "▶ 继续"],
+        pl: ["Oddech mandali", "płynny wdech ↔ wydech, równe fazy", "13 → 1 · wyciszenie", "1 → 13 · wznoszący", "Wdech", "Wydech", "▶ Start", "⏸ Pauza", "🔊 Dźwięk: wł.", "🔇 Dźwięk: wył.", "🔄 Reset", "Naciśnij „Start” i podążaj za oddechem", "Oddychaj spokojnie… podążaj za mandalą.", "Pauza. Naciśnij „Wznów”.", "Gotowe!", "✨ Świetnie! Oddychanie zakończone. ✨", "Brawo! Naciśnij „Reset”, aby powtórzyć.", "Etap", "s", "▶ Wznów"],
+    };
+    const LANG_NAMES = [["ru", "Русский"], ["en", "English"], ["uk", "Українська"], ["be", "Беларуская"], ["kk", "Қазақша"], ["tyv", "Тыва дыл"], ["zh", "中文"], ["pl", "Polski"]];
+    let lang = 'en';
+    const t = k => (I18N[lang] || I18N.en)[KEYS.indexOf(k)];
+
+    /* ===== Фазы и направление (состояние — в памяти) ===== */
+    const basePhases = [
+        { sec: 13, label: '13″' }, { sec: 8, label: '8″' }, { sec: 5, label: '5″' },
+        { sec: 3, label: '3″' }, { sec: 2, label: '2″' }, { sec: 1, label: '1″', rep: 2 }
+    ];
+    let direction = 'down';
+    function phases() {
+        const list = basePhases.map(p => ({ inhale: p.sec, exhale: p.sec, label: p.label, rep: p.rep || 1 }));
+        return direction === 'up' ? list.reverse() : list;
+    }
+
+    let currentPhaseIndex = 0, isInhalePhase = true, cycleInStage = 0;
+    let phaseStart = 0, phaseDur = 0, elapsedAtPause = 0;
+    let isRunning = false, isPaused = false;
+    let rafId = null, lastShown = -1;
+
+    const phaseLabel = document.getElementById('phaseLabel');
+    const countdownDisplay = document.getElementById('countdownDisplay');
+    const stageText = document.getElementById('stageText');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const soundBtn = document.getElementById('soundBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const stepContainer = document.getElementById('stepContainer');
+    const breathingCircle = document.getElementById('breathingCircle');
+    const dirDownBtn = document.getElementById('dirDown');
+    const dirUpBtn = document.getElementById('dirUp');
+
+    /* Плавность: синусоидальное смягчение, без рывков между фазами */
+    function easeInOutSine(t) { return 0.5 - Math.cos(Math.PI * t) / 2; }
+    const SCALE_MIN = 0.8, SCALE_MAX = 1.16;
+
+    function renderSteps() {
+        stepContainer.innerHTML = '';
+        phases().forEach((phase, idx) => {
+            const span = document.createElement('span');
+            span.className = 'step-badge';
+            if (idx < currentPhaseIndex) span.classList.add('completed');
+            else if (idx === currentPhaseIndex && isRunning) span.classList.add('active');
+            span.textContent = phase.rep > 1 ? phase.label + ' ×' + phase.rep : phase.label;
+            stepContainer.appendChild(span);
+        });
+    }
+
+    function updateUiText(timeLeft) {
+        if (currentPhaseIndex >= phases().length) return;
+        const current = phases()[currentPhaseIndex];
+        const phaseType = t(isInhalePhase ? 'in' : 'out');
+        const repTxt = current.rep > 1 ? ` · ${cycleInStage + 1}/${current.rep}` : '';
+        phaseLabel.textContent = phaseType;
+        countdownDisplay.textContent = timeLeft;
+        stageText.innerHTML = `${t('stage')} <b>${current.label}</b>${repTxt} · ${phaseType} · ${timeLeft} ${t('sec')}`;
+    }
+
+    function applyBreath(b) {
+        const s = SCALE_MIN + (SCALE_MAX - SCALE_MIN) * b;
+        breathingCircle.style.transform = `scale(${s.toFixed(4)})`;
+        const glow = 0.5 + 0.5 * b;
+        breathingCircle.style.boxShadow =
+            `0 0 ${Math.round(20 + 26 * glow)}px rgba(123,47,255,${(0.28 + 0.3 * glow).toFixed(2)}),` +
+            `0 0 ${Math.round(44 + 40 * glow)}px rgba(255,47,214,${(0.12 + 0.16 * glow).toFixed(2)}),` +
+            `inset 0 0 ${Math.round(22 + 16 * glow)}px rgba(0,229,255,${(0.1 + 0.1 * glow).toFixed(2)})`;
+    }
+
+    function finishWorkout() {
+        stopAll();
+        releaseWakeLock();
+        beepFinish();
+        // Небольшой "праздник" — круг чуть увеличивается
+        breathingCircle.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        applyBreath(1);
+        setTimeout(() => {
+            breathingCircle.style.transition = '';
+        }, 700);
+        refreshText();
+        renderSteps();
+        updateControlStates();
+    }
+
+    function stopAll() {
+        isRunning = false; isPaused = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        releaseWakeLock();
+        renderSteps();
+        updateControlStates();
+    }
+
+    function startPhase(now) {
+        const current = phases()[currentPhaseIndex];
+        phaseDur = (isInhalePhase ? current.inhale : current.exhale) * 1000;
+        phaseStart = now;
+        lastShown = -1;
+        if (isInhalePhase) beepInhale(); else beepExhale();
+        renderSteps();
+    }
+
+    function advancePhase(now) {
+        if (isInhalePhase) {
+            isInhalePhase = false;
+        } else if (++cycleInStage < phases()[currentPhaseIndex].rep) {
+            isInhalePhase = true; /* повтор этапа: снова вдох-выдох */
+        } else {
+            cycleInStage = 0; currentPhaseIndex++;
+            if (currentPhaseIndex >= phases().length) { finishWorkout(); return; }
+            isInhalePhase = true;
+            beepNewStage();
+        }
+        startPhase(now);
+    }
+
+    function frame(now) {
+        if (isRunning && !isPaused) {
+            if (currentPhaseIndex >= phases().length) { finishWorkout(); return; }
+            const elapsed = now - phaseStart;
+            if (elapsed >= phaseDur) { advancePhase(now); }
+            else {
+                const t = elapsed / phaseDur;
+                applyBreath(isInhalePhase ? easeInOutSine(t) : 1 - easeInOutSine(t));
+                const left = Math.max(1, Math.ceil((phaseDur - elapsed) / 1000));
+                if (left !== lastShown) { lastShown = left; updateUiText(left); }
+            }
+        }
+        rafId = requestAnimationFrame(frame);
+    }
+
+    function fullReset(silent) {
+        stopAll();
+        currentPhaseIndex = 0; isInhalePhase = true; cycleInStage = 0;
+        const first = phases()[0];
+        countdownDisplay.textContent = first.inhale;
+        applyBreath(0);
+        breathingCircle.style.transition = '';
+        renderSteps();
+        refreshText();
+        updateControlStates();
+    }
+
+    function updateControlStates() {
+        const finished = currentPhaseIndex >= phases().length;
+        if (finished) {
+            startBtn.textContent = t('start');
+            startBtn.disabled = true;
+            pauseBtn.disabled = true;
+        } else if (isRunning && isPaused) {
+            startBtn.textContent = t('resume');
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        } else if (isRunning) {
+            startBtn.textContent = t('start');
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+        } else {
+            startBtn.textContent = t('start');
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        }
+    }
+
+    function startCycle() {
+        initAudio();
+        if (currentPhaseIndex >= phases().length) {
+            statusMsg.innerText = t('doneSt');
+            return;
+        }
+        if (!isRunning) {
+            isRunning = true;
+            isPaused = false;
+            requestWakeLock();
+            startPhase(performance.now());
+            updateUiText(phases()[currentPhaseIndex][isInhalePhase ? 'inhale' : 'exhale']);
+            statusMsg.innerText = t('run');
+            if (!rafId) rafId = requestAnimationFrame(frame);
+        } else if (isPaused) {
+            isPaused = false;
+            phaseStart = performance.now() - elapsedAtPause;
+            requestWakeLock();
+            statusMsg.innerText = t('run');
+            if (!rafId) rafId = requestAnimationFrame(frame);
+        }
+        updateControlStates();
+    }
+
+    function pauseCycle() {
+        if (isRunning && !isPaused) {
+            isPaused = true;
+            elapsedAtPause = performance.now() - phaseStart;
+            releaseWakeLock();
+            statusMsg.innerText = t('paused');
+            updateControlStates();
+        }
+    }
+
+    /* ===== Направление ===== */
+    function setDirection(dir) {
+        if (dir === direction) return;
+        direction = dir;
+        dirDownBtn.classList.toggle('active', dir === 'down');
+        dirUpBtn.classList.toggle('active', dir === 'up');
+        fullReset(true);
+    }
+    dirDownBtn.addEventListener('click', () => setDirection('down'));
+    dirUpBtn.addEventListener('click', () => setDirection('up'));
+
+    /* ===== Звук + haptic ===== */
+    let audioCtx = null;
+    let soundEnabled = true;
+    let wakeLock = null;
+
+    function initAudio() {
+        try {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                // resume() returns a promise; we don't block the UI on it
+                audioCtx.resume().catch(() => {});
+            }
+        } catch (e) { /* silent fail */ }
+    }
+
+    function playBeep(freq, durationMs, vol = 0.32) {
+        if (!soundEnabled || !audioCtx) return;
+        // Если ещё не running — пробуем доиграть после resume
+        const doPlay = () => {
+            if (audioCtx.state !== 'running') return;
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                // Более мягкая огибающая, без экстремально низких значений
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.linearRampToValueAtTime(vol, now + 0.025);
+                gain.gain.linearRampToValueAtTime(vol * 0.7, now + durationMs / 1000 * 0.55);
+                gain.gain.linearRampToValueAtTime(0.0001, now + durationMs / 1000);
+                osc.connect(gain).connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + durationMs / 1000 + 0.02);
+            } catch (e) {}
+        };
+        if (audioCtx.state === 'running') {
+            doPlay();
+        } else {
+            initAudio();
+            // даём resume чуть времени
+            setTimeout(doPlay, 40);
+        }
+    }
+
+    function haptic(ms = 18) {
+        try {
+            if (navigator.vibrate) navigator.vibrate(ms);
+        } catch (e) {}
+    }
+
+    function beepInhale() {
+        playBeep(698, 280, 0.34); // F5 — чуть ярче
+        haptic(12);
+    }
+    function beepExhale() {
+        playBeep(440, 320, 0.28); // A4
+        haptic(22);
+    }
+    function beepNewStage() {
+        playBeep(880, 160, 0.3);
+        setTimeout(() => playBeep(660, 220, 0.32), 170);
+        haptic([10, 40, 18]);
+    }
+    function beepFinish() {
+        playBeep(523, 220, 0.3);
+        setTimeout(() => playBeep(659, 220, 0.32), 230);
+        setTimeout(() => playBeep(784, 480, 0.36), 460);
+        haptic([30, 50, 30, 50, 50]);
+    }
+    function beepTest() {
+        playBeep(660, 180, 0.3);
+        setTimeout(() => playBeep(880, 220, 0.28), 160);
+    }
+
+    function updateSoundBtn() {
+        soundBtn.textContent = t(soundEnabled ? 'snd1' : 'snd0');
+        soundBtn.setAttribute('aria-pressed', soundEnabled ? 'true' : 'false');
+    }
+
+    soundBtn.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        if (soundEnabled) {
+            initAudio();
+            // небольшая задержка, чтобы resume успел
+            setTimeout(beepTest, 60);
+        }
+        updateSoundBtn();
+    });
+
+    /* Wake Lock — экран не гаснет во время сессии (best-effort) */
+    function requestWakeLock() {
+        try {
+            if ('wakeLock' in navigator && !wakeLock) {
+                navigator.wakeLock.request('screen').then(lock => {
+                    wakeLock = lock;
+                    lock.addEventListener('release', () => { wakeLock = null; });
+                }).catch(() => {});
+            }
+        } catch (e) {}
+    }
+    function releaseWakeLock() {
+        if (wakeLock) {
+            try { wakeLock.release(); } catch (e) {}
+            wakeLock = null;
+        }
+    }
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && isRunning && !isPaused) {
+            requestWakeLock();
+        }
+    });
+
+    startBtn.addEventListener('click', startCycle);
+    pauseBtn.addEventListener('click', pauseCycle);
+    resetBtn.addEventListener('click', () => fullReset(false));
+
+    // Клавиатура: Space / Enter — старт/пауза, R — сброс
+    document.addEventListener('keydown', (e) => {
+        if (e.target.matches('select, input, textarea')) return;
+        if (e.code === 'Space' || e.code === 'Enter') {
+            e.preventDefault();
+            if (isRunning && !isPaused) pauseCycle();
+            else startCycle();
+        } else if (e.code === 'KeyR' && !e.metaKey && !e.ctrlKey) {
+            fullReset(false);
+        }
+    });
+
+    /* Инициализация */
+    dirDownBtn.classList.toggle('active', direction === 'down');
+    dirUpBtn.classList.toggle('active', direction === 'up');
+    function refreshText() {
+        if (currentPhaseIndex >= phases().length) {
+            phaseLabel.textContent = '🏁';
+            countdownDisplay.textContent = t('done');
+            stageText.innerHTML = t('doneTxt');
+            statusMsg.innerText = t('doneSt');
+        } else if (isRunning) {
+            updateUiText(lastShown > 0 ? lastShown : phases()[currentPhaseIndex][isInhalePhase ? 'inhale' : 'exhale']);
+            statusMsg.innerText = isPaused ? t('paused') : t('run');
+        } else {
+            const f = phases()[currentPhaseIndex];
+            phaseLabel.textContent = t('in');
+            stageText.innerHTML = `<b>${f.label}</b> · ${t('in')} – ${t('out')}`;
+            statusMsg.innerText = t('idle');
+        }
+    }
+    function applyLang(l, save) {
+        lang = I18N[l] ? l : 'en';
+        document.documentElement.lang = lang;
+        document.getElementById('langSel').value = lang;
+        if (save) { try { localStorage.setItem('mandalaLang', lang); } catch (e) {} }
+        document.title = t('title');
+        document.getElementById('titleEl').textContent = '🌬️ ' + t('title');
+        document.getElementById('subEl').textContent = t('sub');
+        dirDownBtn.textContent = t('down'); dirUpBtn.textContent = t('up');
+        pauseBtn.textContent = t('pause'); resetBtn.textContent = t('reset');
+        updateSoundBtn();
+        refreshText();
+        updateControlStates();
+    }
+    const langSel = document.getElementById('langSel');
+    LANG_NAMES.forEach(([code, name]) => langSel.add(new Option(name, code)));
+    langSel.addEventListener('change', () => applyLang(langSel.value, true));
+
+    /* Инициализация: сохранённый язык → язык браузера → English */
+    let savedLang = null;
+    try { savedLang = localStorage.getItem('mandalaLang'); } catch (e) {}
+    const navLang = (navigator.language || 'en').toLowerCase();
+    applyLang(savedLang || Object.keys(I18N).find(k => navLang.startsWith(k)) || 'en');
+    fullReset(true);
+    updateControlStates();
 </script>
 </body>
 </html>
